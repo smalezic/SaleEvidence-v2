@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "File Listener Service", "File Listener Service", "{2B239DD8-B797-4788-80EF-ABE2B5A7407F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Common", "00 - Common", "{265A2D7E-6F84-4FA9-813B-3575942F8197}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Service Host", "03 - Service Host", "{CEF215D2-ADEB-4203-9311-71F5D9656A05}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Data Layer", "01 - Data Layer", "{E804612B-5CFF-4B7D-890C-E8C2002B3F2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Business", "02 - Business", "{EE2F276A-40B7-4444-9630-F8D3B3F9CEE6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-1 - Interfaces", "02-1 - Interfaces", "{F90D35A7-4D67-4F67-8889-55F96DB2E952}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-2 - Implementation", "02-2 - Implementation", "{460CD79B-74D3-4DC3-A84C-7E99E3675A75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleServiceHost", "File Listener Service\03 - Service Host\ConsoleServiceHost\ConsoleServiceHost.csproj", "{745C1AEF-2D45-47C6-BCEB-0830D7A50415}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompositionRoot", "File Listener Service\00 - Common\CompositionRoot\CompositionRoot.csproj", "{21F31B49-4037-494F-BA7B-4A10B4BE01FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileListenerInterface", "File Listener Service\02 - Business\02-1 - Interfaces\FileListenerInterface\FileListenerInterface.csproj", "{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileListener", "File Listener Service\02 - Business\02-2 - Implementation\FileListener\FileListener.csproj", "{F65EC2EB-F06B-472E-9666-31098224A327}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{745C1AEF-2D45-47C6-BCEB-0830D7A50415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745C1AEF-2D45-47C6-BCEB-0830D7A50415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745C1AEF-2D45-47C6-BCEB-0830D7A50415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745C1AEF-2D45-47C6-BCEB-0830D7A50415}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21F31B49-4037-494F-BA7B-4A10B4BE01FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21F31B49-4037-494F-BA7B-4A10B4BE01FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21F31B49-4037-494F-BA7B-4A10B4BE01FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21F31B49-4037-494F-BA7B-4A10B4BE01FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F65EC2EB-F06B-472E-9666-31098224A327}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F65EC2EB-F06B-472E-9666-31098224A327}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F65EC2EB-F06B-472E-9666-31098224A327}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F65EC2EB-F06B-472E-9666-31098224A327}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{265A2D7E-6F84-4FA9-813B-3575942F8197} = {2B239DD8-B797-4788-80EF-ABE2B5A7407F}
+		{CEF215D2-ADEB-4203-9311-71F5D9656A05} = {2B239DD8-B797-4788-80EF-ABE2B5A7407F}
+		{E804612B-5CFF-4B7D-890C-E8C2002B3F2A} = {2B239DD8-B797-4788-80EF-ABE2B5A7407F}
+		{EE2F276A-40B7-4444-9630-F8D3B3F9CEE6} = {2B239DD8-B797-4788-80EF-ABE2B5A7407F}
+		{F90D35A7-4D67-4F67-8889-55F96DB2E952} = {EE2F276A-40B7-4444-9630-F8D3B3F9CEE6}
+		{460CD79B-74D3-4DC3-A84C-7E99E3675A75} = {EE2F276A-40B7-4444-9630-F8D3B3F9CEE6}
+		{745C1AEF-2D45-47C6-BCEB-0830D7A50415} = {CEF215D2-ADEB-4203-9311-71F5D9656A05}
+		{21F31B49-4037-494F-BA7B-4A10B4BE01FE} = {265A2D7E-6F84-4FA9-813B-3575942F8197}
+		{F0EBC7BB-DA2E-4B9D-9699-A1CC5E3370DD} = {F90D35A7-4D67-4F67-8889-55F96DB2E952}
+		{F65EC2EB-F06B-472E-9666-31098224A327} = {460CD79B-74D3-4DC3-A84C-7E99E3675A75}
+	EndGlobalSection
+EndGlobal
