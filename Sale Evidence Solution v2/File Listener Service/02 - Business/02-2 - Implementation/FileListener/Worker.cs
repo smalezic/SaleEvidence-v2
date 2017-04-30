@@ -1,10 +1,10 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
+using System.IO;
 
 namespace ADS.SaleEvidence.RetailServices.FileListener
 {
@@ -14,121 +14,62 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private FileSystemWatcher _watcher;
-        private String _folderName;
-
         #endregion Fields
 
         #region Constructors
 
-        public Worker(String folderName)
+        public Worker()
         {
-            var startTime = DateTime.Now;
 
-            _logger.Debug("Constructing the 'Worker' object...");
-
-            _folderName = folderName;
-
-            _logger.DebugFormat("Construction is done in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
         }
 
         #endregion Constructors
 
-        #region IWorker interface implementation
+        #region Interface Implementation
 
-        public void DoWork()
+        public void ProccessFile(string fileName)
         {
             var startTime = DateTime.Now;
 
             try
             {
-                _logger.Debug("Entered method 'DoWork'");
+                _logger.Debug("Entered method 'ProccessFile'");
 
-                _watcher = new FileSystemWatcher();
-                _watcher.Path = _folderName;
-                _watcher.NotifyFilter = NotifyFilters.LastWrite;
-                _watcher.Filter = "*.*";
-                _watcher.Changed += new FileSystemEventHandler(OnChanged);
-                _watcher.EnableRaisingEvents = true;
+                String content = ReadFile(fileName);
 
+                ProccessData(content);
+
+                DeleteFile(fileName);
             }
             catch (Exception exc)
             {
                 _logger.Error("Error - ", exc);
-                throw;
             }
 
-            _logger.DebugFormat("Method 'DoWork' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            _logger.DebugFormat("Method 'ProccessFile' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
         }
+        
+        #endregion Interface Implementation
 
-        public String LoadFile(String fileName)
+        #region Private Methods
+
+        private String ReadFile(String fileName)
         {
             var startTime = DateTime.Now;
-
-            try
-            {
-                _logger.Debug("Entered method 'LoadFile'");
-            }
-            catch (Exception exc)
-            {
-                _logger.Error("Error - ", exc);
-                throw;
-            }
-
-            _logger.DebugFormat("Method 'LoadFile' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
-                
-                return String.Format("Hello, {0}", fileName);
-        }
-
-        #endregion IWorker interface implementation
-
-        #region IDisposable interface implementation
-
-        public void Dispose()
-        {
-            var startTime = DateTime.Now;
-
-            try
-            {
-                _logger.Debug("Entered method 'Dispose'");
-
-                _watcher.Dispose();
-                _watcher = null;
-            }
-            catch (Exception exc)
-            {
-                _logger.Error("Error - ", exc);
-                throw;
-            }
-
-            _logger.DebugFormat("Method 'Dispose' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
-        }
-
-        #endregion IDisposable interface implementation
-
-        #region Private methods
-
-        private void OnChanged(object sender, FileSystemEventArgs e)
-        {
-            var startTime = DateTime.Now;
+            String retVal;
             StreamReader sr = null;
 
             try
             {
-                _logger.Debug("Entered method 'OnChanged'");
+                _logger.Debug("Entered method 'ReadFile'");
 
-                var file = e.FullPath;
-                _logger.DebugFormat("File - {0}", file);
-
-                sr = new StreamReader(file);
-                var content = sr.ReadToEnd();
-
-                _logger.DebugFormat("Content:{0}{1}", Environment.NewLine, content);
+                sr = new StreamReader(fileName);
+                retVal = sr.ReadToEnd();
             }
             catch (Exception exc)
             {
                 _logger.Error("Error - ", exc);
-                throw;
+                retVal = String.Empty;
             }
             finally
             {
@@ -139,9 +80,54 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                 }
             }
 
-            _logger.DebugFormat("Method 'OnChanged' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            _logger.DebugFormat("Method 'ReadFile' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            return retVal;
         }
 
-        #endregion Private methods
+        private void ProccessData(String fileContent)
+        {
+            var startTime = DateTime.Now;
+
+            try
+            {
+                _logger.Debug("Entered method 'ProccessData'");
+
+                var lines = fileContent.Split(Environment.NewLine.ToCharArray())
+                    .Where(it => String.IsNullOrEmpty(it) == false);
+                _logger.DebugFormat("Number of lines - {0}", lines.Count());
+
+                int counter = 0;
+                lines.ToList().ForEach(line =>
+                {
+                    _logger.DebugFormat("Line {0} - {1}", ++counter, line);
+                });
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+            }
+
+            _logger.DebugFormat("Method 'ProccessData' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        }
+
+        private void DeleteFile(String fileName)
+        {
+            var startTime = DateTime.Now;
+
+            try
+            {
+                _logger.Debug("Entered method 'DeleteFile'");
+
+                File.Delete(fileName);
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+            }
+
+            _logger.DebugFormat("Method 'DeleteFile' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        }
+
+        #endregion Private Methods
     }
 }

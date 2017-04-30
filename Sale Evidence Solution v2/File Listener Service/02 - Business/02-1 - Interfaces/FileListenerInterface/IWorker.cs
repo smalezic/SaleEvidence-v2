@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ADS.SaleEvidence.RetailServices.FileListener
 {
-    public interface IWorker : IDisposable
+    public interface IWorker
     {
-        void DoWork();
-        String LoadFile(String fileName);
+        void ProccessFile(String fileName);
     }
 }

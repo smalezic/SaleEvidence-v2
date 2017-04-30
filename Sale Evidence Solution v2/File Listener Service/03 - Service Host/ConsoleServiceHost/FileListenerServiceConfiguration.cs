@@ -10,13 +10,13 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
 {
     internal class FileListenerServiceConfiguration
     {
-        internal static void Configure(IWorker worker)
+        internal static void Configure(IDispatcher dispatcher)
         {
             HostFactory.Run(configure =>
             {
                 configure.Service<FileListenerService>(service =>
                 {
-                    service.ConstructUsing(s => new FileListenerService(worker));
+                    service.ConstructUsing(s => new FileListenerService(dispatcher));
                     service.WhenStarted(s => s.Start());
                     service.WhenStopped(s => s.Stop());
                 });

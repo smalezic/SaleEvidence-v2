@@ -40,6 +40,7 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
             try
             {
                 // Register implementations of interfaces here
+                builder.RegisterType<Dispatcher>().As<IDispatcher>();
                 builder.RegisterType<Worker>().As<IWorker>();
 
                 // Build the container
@@ -71,17 +72,24 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
             }
         }
 
-        public IWorker ResolveWorker(String folderName)
+        public IDispatcher ResolveDispatcher(IWorker worker, String folderName)
         {
             try
             {
+                var paramList = new List<ResolvedParameter>
+                {
+                    new ResolvedParameter(
+                            (pi, ctx) => pi.ParameterType == typeof(IWorker) && pi.Name == "worker",
+                            (pi, ctx) => worker
+                        ),
+                    new ResolvedParameter(
+                            (pi, ctx) => pi.ParameterType == typeof(String) && pi.Name == "folderName",
+                            (pi, ctx) => folderName
+                        )
+                };
                 ILifetimeScope clientLifetimeScope = _container.BeginLifetimeScope();
 
-                return clientLifetimeScope.Resolve<IWorker>(
-                    new ResolvedParameter(
-                        (pi, ctx) => pi.ParameterType == typeof(String) && pi.Name == "folderName",
-                        (pi, ctx) => folderName
-                    ));
+                return clientLifetimeScope.Resolve<IDispatcher>(paramList);
             }
             catch (Exception exc)
             {

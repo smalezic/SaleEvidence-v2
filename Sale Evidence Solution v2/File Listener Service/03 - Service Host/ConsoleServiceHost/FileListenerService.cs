@@ -14,12 +14,12 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
         
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private IWorker _worker;
+        private IDispatcher _worker;
 
         #endregion Fields
 
         #region Constructor
-        public FileListenerService(IWorker worker)
+        public FileListenerService(IDispatcher worker)
         {
             var startTime = DateTime.Now;
 
