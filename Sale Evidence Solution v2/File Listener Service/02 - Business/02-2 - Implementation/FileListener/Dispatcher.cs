@@ -106,6 +106,9 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                 var fileName = e.FullPath;
                 _logger.DebugFormat("File - {0}", fileName);
 
+                _logger.Debug("Wait for one second for finishing file coping");
+                System.Threading.Thread.Sleep(1000);
+
                 _worker.ProccessFile(fileName);
             }
             catch (Exception exc)

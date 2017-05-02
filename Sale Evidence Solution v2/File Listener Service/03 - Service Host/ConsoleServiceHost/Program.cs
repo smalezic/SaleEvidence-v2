@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using log4net;
+using ADS.SaleEvidence.RetailServices.RepositoryActivity;
 
 namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
 {
@@ -27,8 +28,9 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
             FabricModule fabricModule = new FabricModule();
             fabricModule.Load();
 
-            var worker = fabricModule.Resolve<IWorker>();
             var folderName = ConfigurationManager.AppSettings["FolderPath"];
+            var dataActivity = fabricModule.Resolve<IDataActivity>();
+            var worker = fabricModule.ResolveWorker(dataActivity);
             var dispatcher = fabricModule.ResolveDispatcher(worker, folderName);
 
             _logger.Debug("Starting the service!");

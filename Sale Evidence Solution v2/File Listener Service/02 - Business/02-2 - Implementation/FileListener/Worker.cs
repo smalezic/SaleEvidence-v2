@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
+using ADS.SaleEvidence.RetailServices.RepositoryActivity;
+using ADS.SaleEvidence.RetailServices.ObjectModel;
 
 namespace ADS.SaleEvidence.RetailServices.FileListener
 {
@@ -12,15 +15,27 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
     {
         #region Fields
 
+        private const char UNDERSCORE = '_';
+        private const char TAB = '\t';
+
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private IDataActivity _dataActivity;
+
+        private struct FileNameParts
+        {
+            public String CachRegisterName { get; set; }
+            public String ReportType { get; set; }
+            public DateTime DateTimeStamp { get; set; }
+        }
 
         #endregion Fields
 
         #region Constructors
 
-        public Worker()
+        public Worker(IDataActivity dataActivity)
         {
-
+            _dataActivity = dataActivity;
         }
 
         #endregion Constructors
@@ -35,10 +50,29 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
             {
                 _logger.Debug("Entered method 'ProccessFile'");
 
+                //SaleEvidenceDbContext context = new SaleEvidenceDbContext();
+                //var terminals = context.Terminals;
+                //var salepoints = context.SalePoints;
+                //var actions = context.Actions.Take(10);
+                //var sellings = context.Sellings
+                //    .Join(context.Actions,
+                //        selling => selling.Id,
+                //        action => action.Id,
+                //        (selling, action) => new { Selling = selling, Action = action }
+                //    )
+                //    //.Include(it => it.Article)
+                //    .Take(10);
+                //var articles = context.Articles.Take(10);
+
+                //var terminals = _dataActivity.GetAll<Terminal>();
+
+                // Getting the content of the file
                 String content = ReadFile(fileName);
+                
+                // Parsing data from the file and store info to the database
+                ProcessData(fileName, content);
 
-                ProccessData(content);
-
+                // Get rid of the processed file
                 DeleteFile(fileName);
             }
             catch (Exception exc)
@@ -84,30 +118,160 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
             return retVal;
         }
 
-        private void ProccessData(String fileContent)
+        private void ProcessData(String fileName, String fileContent)
         {
             var startTime = DateTime.Now;
 
             try
             {
-                _logger.Debug("Entered method 'ProccessData'");
+                _logger.Debug("Entered method 'ProcessData'");
 
-                var lines = fileContent.Split(Environment.NewLine.ToCharArray())
-                    .Where(it => String.IsNullOrEmpty(it) == false);
-                _logger.DebugFormat("Number of lines - {0}", lines.Count());
+                _logger.Debug("Get data from file name");
+                var nameParts = ResolveFileName(fileName);
 
-                int counter = 0;
-                lines.ToList().ForEach(line =>
+                _logger.DebugFormat("Find Terminal entity by cach register name - {0}", nameParts.CachRegisterName);
+                var terminal = _dataActivity.GetByCriteria<Terminal>(it => it.mPOSId == nameParts.CachRegisterName)
+                    .FirstOrDefault();
+
+                if (terminal != null)
                 {
-                    _logger.DebugFormat("Line {0} - {1}", ++counter, line);
-                });
+                    _logger.Debug("Prepare content for storing data to database");
+                    var lines = fileContent.Split(Environment.NewLine.ToCharArray())
+                        .Where(it => String.IsNullOrWhiteSpace(it) == false);
+                    _logger.DebugFormat("Number of lines - {0}", lines.Count());
+
+                    int counter = 0;
+                    lines.ToList().ForEach(line =>
+                    {
+                        _logger.DebugFormat("Line {0} - {1}", ++counter, line);
+
+                        // Example of file for processing
+                        /*
+                         * 25/04/17 20:04 Event:ZRepBegin
+                         * ID	Barcode	Name	Price	Quantity	Turnover
+                         * 1	0	COCA COLA 250 ML	130.00	3.0	390.0
+                         * 2	0	FANTA 250ml	130.00	2.0	260.0
+                         * 3	8600115360215	Marlboro	270.00	3.0	810.0
+                         * 4	0	COCTA 200ml	130.00	5.0	650.0
+                         * ---END OF REPORT---
+                        */
+
+                        // The first two and the last line will be skipped as well as the first column
+                        if (counter > 2 && counter < lines.Count())
+                        {
+                            try
+                            {
+                                var data = line.Split(TAB);
+
+                                var barcode = data[1];
+                                var quantity = data[4].Split('.').FirstOrDefault();
+
+                                // Check barcode from line
+                                if (barcode == "0")
+                                {
+                                    // Barcode is unknown, there is no exact way to figure out which product is about
+                                }
+                                else
+                                {
+                                    _logger.DebugFormat("Find article - '{0}'", barcode);
+                                    var article = _dataActivity.GetByCriteria<Article>(it => it.Barcode == barcode)
+                                        .FirstOrDefault();
+                                    if (article != null)
+                                    {
+                                        _logger.DebugFormat("Article found - {0}", article.Name);
+
+                                        _logger.DebugFormat("Parsing quantity - '{0}'", quantity);
+                                        var amount = short.Parse(quantity);
+
+                                        // Storing selling to the database
+                                        _logger.Debug("Create an Action entity");
+                                        var action = new ObjectModel.Action()
+                                        {
+                                            InitTime = nameParts.DateTimeStamp,
+                                            Calculated = false,
+                                            SalePointId = terminal.SalePointId
+                                        };
+
+                                        _logger.Debug("Store Action entity to the database");
+                                        action = _dataActivity.Save<ObjectModel.Action>(action);
+
+                                        // TODO: Check prices from CodeBook. If selling prices differs, update the prace in CodeBook
+                                        _logger.Debug("Create a Selling entity");
+                                        var selling = new Selling()
+                                        {
+                                            Id = action.Id,
+                                            ArticleId = article.Id,
+                                            Quantity = amount,
+                                            InputPrice = 10m,
+                                            UnitPrice = 15m
+                                        };
+
+                                        _logger.Debug("Store Selling entity to the database");
+                                        selling = _dataActivity.Save<Selling>(selling);
+                                    }
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                // Log the error and continue
+                                _logger.ErrorFormat("Error - {0}", exc.Message);
+                            }
+                        }
+                    });
+                }
             }
             catch (Exception exc)
             {
                 _logger.Error("Error - ", exc);
             }
 
-            _logger.DebugFormat("Method 'ProccessData' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            _logger.DebugFormat("Method 'ProcessData' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        }
+
+        private FileNameParts ResolveFileName(String fileName)
+        {
+            var startTime = DateTime.Now;
+            FileNameParts retVal;
+
+            try
+            {
+                _logger.DebugFormat("Entered method 'ResolveFileName', fileName - {0}", fileName);
+
+                fileName = Path.GetFileNameWithoutExtension(fileName);
+                
+                var nameParts = fileName.Split(UNDERSCORE);
+
+                // Resolve date and time
+                var dateString = nameParts[2];
+                var year = int.Parse(String.Format("20{0}", dateString.Substring(0, 2)));
+                var month = int.Parse(dateString.Substring(2, 2));
+                var day = int.Parse(dateString.Substring(4));
+
+                var timeString = nameParts[3];
+                var hour = int.Parse(timeString.Substring(0, 2));
+                var minute = int.Parse(timeString.Substring(2, 2));
+                var second = int.Parse(timeString.Substring(4));
+
+                _logger.DebugFormat("DateTime string - {0}-{1}-{2} {3}:{4}:{5}", year, month, day, hour, minute, second);
+
+                DateTime transactionDate = new DateTime(year, month, day, hour, minute, second);
+
+                retVal = new FileNameParts()
+                {
+                    CachRegisterName = nameParts[0],
+                    ReportType = nameParts[1],
+                    DateTimeStamp = transactionDate
+                };
+
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+                throw;
+            }
+
+            _logger.DebugFormat("Method 'ResolveFileName' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            return retVal;
         }
 
         private void DeleteFile(String fileName)

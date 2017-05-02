@@ -7,6 +7,7 @@ using Autofac;
 using Autofac.Core;
 using ADS.SaleEvidence.RetailServices.FileListener;
 using log4net;
+using ADS.SaleEvidence.RetailServices.RepositoryActivity;
 
 namespace ADS.SaleEvidence.Common.CompositionRoot
 {
@@ -42,6 +43,7 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
                 // Register implementations of interfaces here
                 builder.RegisterType<Dispatcher>().As<IDispatcher>();
                 builder.RegisterType<Worker>().As<IWorker>();
+                builder.RegisterType<DataActivity>().As<IDataActivity>();
 
                 // Build the container
                 _container = builder.Build();
@@ -64,6 +66,28 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
                 ILifetimeScope clientLifetimeScope = _container.BeginLifetimeScope();
 
                 return clientLifetimeScope.Resolve<T>();
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+                throw;
+            }
+        }
+
+        public IWorker ResolveWorker(IDataActivity dataActivity)
+        {
+            try
+            {
+                var paramList = new List<ResolvedParameter>
+                {
+                    new ResolvedParameter(
+                            (pi, ctx) => pi.ParameterType == typeof(IDataActivity) && pi.Name == "dataActivity",
+                            (pi, ctx) => dataActivity
+                        )
+                };
+                ILifetimeScope clientLifetimeScope = _container.BeginLifetimeScope();
+
+                return clientLifetimeScope.Resolve<IWorker>(paramList);
             }
             catch (Exception exc)
             {
