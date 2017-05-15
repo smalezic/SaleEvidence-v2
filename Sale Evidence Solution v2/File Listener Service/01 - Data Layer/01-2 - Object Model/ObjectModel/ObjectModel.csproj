@@ -154,6 +154,7 @@
   <ItemGroup>
     <Compile Include="Objects Definition\Action.cs" />
     <Compile Include="Objects Definition\Article.cs" />
+    <Compile Include="Objects Definition\CodeBook.cs" />
     <Compile Include="Objects Definition\SalePoint.cs" />
     <Compile Include="Objects Definition\Selling.cs" />
     <Compile Include="Objects Definition\Terminal.cs" />

@@ -23,6 +23,7 @@ namespace ADS.SaleEvidence.RetailServices.DataBroker
         public DbSet<ObjectModel.Action> Actions { get; set; }
         public DbSet<Selling> Sellings { get; set; }
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Article> CodeBooks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,6 +43,12 @@ namespace ADS.SaleEvidence.RetailServices.DataBroker
 
             modelBuilder.Entity<Selling>()
                 .ToTable("Actions_Selling");
+
+            modelBuilder.Entity<Article>()
+                .ToTable("Articles");
+
+            modelBuilder.Entity<CodeBook>()
+                .ToTable("CodeBooks");
 
             _logger.Debug("Fluent API is done");
         }

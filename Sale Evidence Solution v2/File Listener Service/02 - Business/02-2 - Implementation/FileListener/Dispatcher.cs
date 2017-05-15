@@ -37,7 +37,7 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
         #endregion Constructors
 
-        #region IWorker interface implementation
+        #region IDispatcher interface implementation
 
         public void DoWork()
         {
@@ -49,7 +49,6 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
                 _watcher = new FileSystemWatcher();
                 _watcher.Path = _folderName;
-                //_watcher.NotifyFilter = NotifyFilters.LastWrite;
                 _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size;
                 _watcher.Filter = "*.*";
                 _watcher.Changed += new FileSystemEventHandler(OnChanged);
@@ -64,8 +63,8 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
             _logger.DebugFormat("Method 'DoWork' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
         }
-        
-        #endregion IWorker interface implementation
+
+        #endregion IDispatcher interface implementation
 
         #region IDisposable interface implementation
 

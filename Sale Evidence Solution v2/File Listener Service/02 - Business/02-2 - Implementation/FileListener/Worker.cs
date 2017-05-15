@@ -8,6 +8,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using ADS.SaleEvidence.RetailServices.RepositoryActivity;
 using ADS.SaleEvidence.RetailServices.ObjectModel;
+using System.Transactions;
 
 namespace ADS.SaleEvidence.RetailServices.FileListener
 {
@@ -132,7 +133,7 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                 _logger.DebugFormat("Find Terminal entity by cach register name - {0}", nameParts.CachRegisterName);
                 var terminal = _dataActivity.GetByCriteria<Terminal>(it => it.mPOSId == nameParts.CachRegisterName)
                     .FirstOrDefault();
-
+                
                 if (terminal != null)
                 {
                     _logger.Debug("Prepare content for storing data to database");
@@ -141,73 +142,145 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                     _logger.DebugFormat("Number of lines - {0}", lines.Count());
 
                     int counter = 0;
+
+                    // Example of file for processing
+                    /*
+                     * 25/04/17 20:04 Event:ZRepBegin
+                     * ID	Barcode	Name	Price	Quantity	Turnover
+                     * 1	0	COCA COLA 250 ML	130.00	3.0	390.0
+                     * 2	0	FANTA 250ml	130.00	2.0	260.0
+                     * 3	8600115360215	Marlboro	270.00	3.0	810.0
+                     * 4	0	COCTA 200ml	130.00	5.0	650.0
+                     * ---END OF REPORT---
+                    */
+
                     lines.ToList().ForEach(line =>
                     {
                         _logger.DebugFormat("Line {0} - {1}", ++counter, line);
-
-                        // Example of file for processing
-                        /*
-                         * 25/04/17 20:04 Event:ZRepBegin
-                         * ID	Barcode	Name	Price	Quantity	Turnover
-                         * 1	0	COCA COLA 250 ML	130.00	3.0	390.0
-                         * 2	0	FANTA 250ml	130.00	2.0	260.0
-                         * 3	8600115360215	Marlboro	270.00	3.0	810.0
-                         * 4	0	COCTA 200ml	130.00	5.0	650.0
-                         * ---END OF REPORT---
-                        */
 
                         // The first two and the last line will be skipped as well as the first column
                         if (counter > 2 && counter < lines.Count())
                         {
                             try
                             {
+                                _logger.Debug("Parsing the line");
+
                                 var data = line.Split(TAB);
 
                                 var barcode = data[1];
+                                var articleName = data[2];
+                                var price = data[3];
                                 var quantity = data[4].Split('.').FirstOrDefault();
 
                                 // Check barcode from line
-                                if (barcode == "0")
+                                if (String.IsNullOrWhiteSpace(barcode) || barcode == "0")
                                 {
                                     // Barcode is unknown, there is no exact way to figure out which product is about
+                                    _logger.Warn("Barcode is unknown!");
+
+                                    // TODO: Search through CodeBook for Code field and compare with it
                                 }
                                 else
                                 {
                                     _logger.DebugFormat("Find article - '{0}'", barcode);
                                     var article = _dataActivity.GetByCriteria<Article>(it => it.Barcode == barcode)
                                         .FirstOrDefault();
+                                    if(article == null)
+                                    {
+                                        // For some barcodes the last digit isn't stored
+                                        var shortenBarcode = barcode.Substring(0, barcode.Length - 1);
+                                        _logger.DebugFormat("Find article for shorten barcode - '{0}'", shortenBarcode);
+                                        article = _dataActivity.GetByCriteria<Article>(it => it.Barcode == shortenBarcode)
+                                            .FirstOrDefault();
+                                    }
+
                                     if (article != null)
                                     {
                                         _logger.DebugFormat("Article found - {0}", article.Name);
 
-                                        _logger.DebugFormat("Parsing quantity - '{0}'", quantity);
-                                        var amount = short.Parse(quantity);
+                                        _logger.DebugFormat("Parsing the quantity - '{0}'", quantity);
+                                        short amount = 0;
+                                        short.TryParse(quantity, out amount);
+                                        _logger.DebugFormat("amount - '{0}'", amount);
 
-                                        // Storing selling to the database
-                                        _logger.Debug("Create an Action entity");
-                                        var action = new ObjectModel.Action()
+                                        if (amount != 0)
                                         {
-                                            InitTime = nameParts.DateTimeStamp,
-                                            Calculated = false,
-                                            SalePointId = terminal.SalePointId
-                                        };
+                                            // Check prices from CodeBook. If selling prices differs, update the price in CodeBook
+                                            _logger.DebugFormat("Find the record from CodeBook by SalePointId - {0} and ArticleId - {1}", terminal.SalePointId, article.Id);
+                                            var codeBook = _dataActivity.GetByCriteria<CodeBook>(it =>
+                                                    it.SalePointId == terminal.SalePointId
+                                                    && it.ArticleId == article.Id)
+                                                .SingleOrDefault();
 
-                                        _logger.Debug("Store Action entity to the database");
-                                        action = _dataActivity.Save<ObjectModel.Action>(action);
+                                            if (codeBook != null)
+                                            {
+                                                _logger.DebugFormat("CodeBook.Id - {0}", codeBook.Id);
+                                            }
+                                            else
+                                            {
+                                                _logger.Warn("The CodeBook wasn't found!");
+                                                codeBook = new CodeBook()
+                                                {
+                                                    SalePointId = terminal.SalePointId,
+                                                    ArticleId = article.Id
+                                                };
+                                            }
 
-                                        // TODO: Check prices from CodeBook. If selling prices differs, update the prace in CodeBook
-                                        _logger.Debug("Create a Selling entity");
-                                        var selling = new Selling()
+                                            _logger.DebugFormat("Parsing the price - '{0}'", price);
+                                            decimal sellingPrice = 0m;
+                                            decimal.TryParse(price, out sellingPrice);
+                                            _logger.DebugFormat("sellingPrice - '{0}'", sellingPrice);
+
+                                            //using (var scope = new TransactionScope())
+                                            //{
+                                                // Update the CodeBook record
+                                                codeBook.SellingPrice = sellingPrice;
+                                                //codeBook.Name = articleName.Trim();
+                                               
+                                                if(codeBook.StoreAmount != null)
+                                                {
+                                                    codeBook.StoreAmount -= amount;
+                                                }
+
+                                                _logger.Debug("Updating the CodeBook");
+                                                _dataActivity.Save<CodeBook>(codeBook);
+
+                                                // Storing selling to the database
+                                                _logger.Debug("Create an Action entity");
+                                                var action = new ObjectModel.Action()
+                                                {
+                                                    InitTime = nameParts.DateTimeStamp,
+                                                    Calculated = false,
+                                                    SalePointId = terminal.SalePointId
+                                                };
+
+                                                _logger.Debug("Store Action entity to the database");
+                                                action = _dataActivity.Save<ObjectModel.Action>(action);
+                                                _logger.Debug("Create a Selling entity");
+                                                var selling = new Selling()
+                                                {
+                                                    Id = action.Id,
+                                                    ArticleId = article.Id,
+                                                    Quantity = amount,
+                                                    InputPrice = codeBook.InputPrice,
+                                                    UnitPrice = codeBook.SellingPrice
+                                                };
+
+                                                _logger.Debug("Store Selling entity to the database");
+                                                selling = _dataActivity.Save<Selling>(selling);
+
+                                                _logger.Debug("All changes are saved");
+                                            //    scope.Complete();
+                                            //}
+                                        }
+                                        else
                                         {
-                                            Id = action.Id,
-                                            ArticleId = article.Id,
-                                            Quantity = amount,
-                                            InputPrice = 10m,
-                                            UnitPrice = 15m
-                                        };
-
-                                        _logger.Debug("Store Selling entity to the database");
-                                        selling = _dataActivity.Save<Selling>(selling);
+                                            _logger.Warn("The amount has no value!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        _logger.WarnFormat("The barcode {0} was not found!", barcode);
                                     }
                                 }
                             }
@@ -216,6 +289,10 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                                 // Log the error and continue
                                 _logger.ErrorFormat("Error - {0}", exc.Message);
                             }
+                        }
+                        else
+                        {
+                            _logger.DebugFormat("This line is skipped - {0}. {1}", counter, line);
                         }
                     });
                 }

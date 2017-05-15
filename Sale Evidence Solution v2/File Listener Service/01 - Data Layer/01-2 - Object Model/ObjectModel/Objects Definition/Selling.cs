@@ -9,7 +9,9 @@ namespace ADS.SaleEvidence.RetailServices.ObjectModel
     {
         [ForeignKey("Action")]
         public int Id { get; set; }
+        [ForeignKey("Article")]
         public int ArticleId { get; set; }
+
         public short Quantity { get; set; }
         public Nullable<decimal> UnitPrice { get; set; }
         public Nullable<decimal> InputPrice { get; set; }
