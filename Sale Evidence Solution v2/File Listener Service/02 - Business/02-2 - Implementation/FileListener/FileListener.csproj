@@ -31,11 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.6.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\Autofac.4.6.0\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\packages\Microsoft.EntityFrameworkCore.1.1.1\lib\net451\Microsoft.EntityFrameworkCore.dll</HintPath>
+    <Reference Include="Microsoft.EntityFrameworkCore, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\Microsoft.EntityFrameworkCore.1.1.2\lib\net451\Microsoft.EntityFrameworkCore.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\packages\Microsoft.Extensions.Caching.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
@@ -77,6 +80,7 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Console, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\packages\System.Console.4.3.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
@@ -159,12 +163,15 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Dispatcher.cs" />
-    <Compile Include="Worker.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\00 - Common\CompositionRoot\CompositionRoot.csproj">
+      <Project>{21f31b49-4037-494f-ba7b-4a10b4be01fe}</Project>
+      <Name>CompositionRoot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\01 - Data Layer\01-2 - Object Model\ObjectModel\ObjectModel.csproj">
       <Project>{3be46058-77d5-4dbf-9490-3d255eeea646}</Project>
       <Name>ObjectModel</Name>
@@ -176,6 +183,10 @@
     <ProjectReference Include="..\..\02-1 - Interfaces\FileListenerInterface\FileListenerInterface.csproj">
       <Project>{f0ebc7bb-da2e-4b9d-9699-a1cc5e3370dd}</Project>
       <Name>FileListenerInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\02-1 - Interfaces\FileProcessorInterface\FileProcessorInterface.csproj">
+      <Project>{c418d187-059d-4dfc-b015-24e983dbddda}</Project>
+      <Name>FileProcessorInterface</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

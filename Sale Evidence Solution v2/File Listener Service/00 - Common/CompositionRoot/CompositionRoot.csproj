@@ -64,13 +64,13 @@
       <Project>{4bc58d50-9267-42c4-af48-d9348af3da22}</Project>
       <Name>RepositoryActivity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\02 - Business\02-1 - Interfaces\FileListenerInterface\FileListenerInterface.csproj">
-      <Project>{f0ebc7bb-da2e-4b9d-9699-a1cc5e3370dd}</Project>
-      <Name>FileListenerInterface</Name>
+    <ProjectReference Include="..\..\02 - Business\02-1 - Interfaces\FileProcessorInterface\FileProcessorInterface.csproj">
+      <Project>{c418d187-059d-4dfc-b015-24e983dbddda}</Project>
+      <Name>FileProcessorInterface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\02 - Business\02-2 - Implementation\FileListener\FileListener.csproj">
-      <Project>{f65ec2eb-f06b-472e-9666-31098224a327}</Project>
-      <Name>FileListener</Name>
+    <ProjectReference Include="..\..\02 - Business\02-2 - Implementation\FileProcessor\FileProcessor.csproj">
+      <Project>{86d7dae3-968f-445f-8904-e1ace8a335d0}</Project>
+      <Name>FileProcessor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

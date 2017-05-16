@@ -8,6 +8,7 @@ using Autofac.Core;
 using ADS.SaleEvidence.RetailServices.FileListener;
 using log4net;
 using ADS.SaleEvidence.RetailServices.RepositoryActivity;
+using ADS.SaleEvidence.RetailServices.FileListener.FileProcessor;
 
 namespace ADS.SaleEvidence.Common.CompositionRoot
 {
@@ -41,7 +42,7 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
             try
             {
                 // Register implementations of interfaces here
-                builder.RegisterType<Dispatcher>().As<IDispatcher>();
+                //builder.RegisterType<Dispatcher>().As<IDispatcher>();
                 builder.RegisterType<Worker>().As<IWorker>();
                 builder.RegisterType<DataActivity>().As<IDataActivity>();
 
@@ -96,31 +97,31 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
             }
         }
 
-        public IDispatcher ResolveDispatcher(IWorker worker, String folderName)
-        {
-            try
-            {
-                var paramList = new List<ResolvedParameter>
-                {
-                    new ResolvedParameter(
-                            (pi, ctx) => pi.ParameterType == typeof(IWorker) && pi.Name == "worker",
-                            (pi, ctx) => worker
-                        ),
-                    new ResolvedParameter(
-                            (pi, ctx) => pi.ParameterType == typeof(String) && pi.Name == "folderName",
-                            (pi, ctx) => folderName
-                        )
-                };
-                ILifetimeScope clientLifetimeScope = _container.BeginLifetimeScope();
+        //public IDispatcher ResolveDispatcher(IWorker worker, String folderName)
+        //{
+        //    try
+        //    {
+        //        var paramList = new List<ResolvedParameter>
+        //        {
+        //            new ResolvedParameter(
+        //                    (pi, ctx) => pi.ParameterType == typeof(IWorker) && pi.Name == "worker",
+        //                    (pi, ctx) => worker
+        //                ),
+        //            new ResolvedParameter(
+        //                    (pi, ctx) => pi.ParameterType == typeof(String) && pi.Name == "folderName",
+        //                    (pi, ctx) => folderName
+        //                )
+        //        };
+        //        ILifetimeScope clientLifetimeScope = _container.BeginLifetimeScope();
 
-                return clientLifetimeScope.Resolve<IDispatcher>(paramList);
-            }
-            catch (Exception exc)
-            {
-                _logger.Error("Error - ", exc);
-                throw;
-            }
-        }
+        //        return clientLifetimeScope.Resolve<IDispatcher>(paramList);
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        _logger.Error("Error - ", exc);
+        //        throw;
+        //    }
+        //}
 
         #endregion Resolve
     }

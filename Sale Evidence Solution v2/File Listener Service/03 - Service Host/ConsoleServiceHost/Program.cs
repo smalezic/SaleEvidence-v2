@@ -25,13 +25,15 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
         {
             _logger.Debug("File Listener Service is about to start...");
 
-            FabricModule fabricModule = new FabricModule();
-            fabricModule.Load();
+            //FabricModule fabricModule = new FabricModule();
+            //fabricModule.Load();
 
             var folderName = ConfigurationManager.AppSettings["FolderPath"];
-            var dataActivity = fabricModule.Resolve<IDataActivity>();
-            var worker = fabricModule.ResolveWorker(dataActivity);
-            var dispatcher = fabricModule.ResolveDispatcher(worker, folderName);
+            //var dataActivity = fabricModule.Resolve<IDataActivity>();
+            //var worker = fabricModule.ResolveWorker(dataActivity);
+            //var dispatcher = fabricModule.ResolveDispatcher(worker, folderName);
+
+            var dispatcher = new Dispatcher(folderName);
 
             _logger.Debug("Starting the service!");
             FileListenerServiceConfiguration.Configure(dispatcher);
