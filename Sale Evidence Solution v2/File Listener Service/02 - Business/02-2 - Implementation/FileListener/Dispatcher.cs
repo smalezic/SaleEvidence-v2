@@ -61,10 +61,12 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
             {
                 _logger.Debug("Entered method 'DoWork'");
 
-                _watcher = new FileSystemWatcher();
-                _watcher.Path = _folderName;
-                _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size;
-                _watcher.Filter = "*.*";
+                _watcher = new FileSystemWatcher()
+                {
+                    Path = _folderName,
+                    NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size,
+                    Filter = "*.*"
+                };
                 _watcher.Changed += new FileSystemEventHandler(OnChanged);
                 _watcher.EnableRaisingEvents = true;
 

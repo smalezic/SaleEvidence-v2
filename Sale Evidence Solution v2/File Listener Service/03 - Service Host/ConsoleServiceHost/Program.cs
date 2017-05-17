@@ -1,5 +1,4 @@
-﻿using ADS.SaleEvidence.Common.CompositionRoot;
-using ADS.SaleEvidence.RetailServices.FileListener;
+﻿using ADS.SaleEvidence.RetailServices.FileListener;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using System.Configuration;
 using log4net;
 using ADS.SaleEvidence.RetailServices.RepositoryActivity;
+using System.Reflection;
 
 namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
 {
@@ -23,22 +23,34 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
 
         static void Main(string[] args)
         {
-            _logger.Debug("File Listener Service is about to start...");
+            try
+            {
+                _logger.Debug("File Listener Service is about to start...");
 
-            //FabricModule fabricModule = new FabricModule();
-            //fabricModule.Load();
+                String assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            var folderName = ConfigurationManager.AppSettings["FolderPath"];
-            //var dataActivity = fabricModule.Resolve<IDataActivity>();
-            //var worker = fabricModule.ResolveWorker(dataActivity);
-            //var dispatcher = fabricModule.ResolveDispatcher(worker, folderName);
+                _logger.DebugFormat("Version - {0}", assemblyVersion);
 
-            var dispatcher = new Dispatcher(folderName);
+                //FabricModule fabricModule = new FabricModule();
+                //fabricModule.Load();
 
-            _logger.Debug("Starting the service!");
-            FileListenerServiceConfiguration.Configure(dispatcher);
+                var folderName = ConfigurationManager.AppSettings["FolderPath"];
+                //var dataActivity = fabricModule.Resolve<IDataActivity>();
+                //var worker = fabricModule.ResolveWorker(dataActivity);
+                //var dispatcher = fabricModule.ResolveDispatcher(worker, folderName);
 
-            _logger.DebugFormat("File Listener Service has been stopped");
+                var dispatcher = new Dispatcher(folderName);
+
+                _logger.Debug("Starting the service!");
+                FileListenerServiceConfiguration.Configure(dispatcher);
+
+                _logger.DebugFormat("File Listener Service has been stopped");
+            }
+            catch(Exception exc)
+            {
+                _logger.Error("Error in host file execution!");
+                _logger.Error(exc);
+            }
         }
 
         #endregion Main

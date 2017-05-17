@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Core;
-using ADS.SaleEvidence.RetailServices.FileListener;
 using log4net;
 using ADS.SaleEvidence.RetailServices.RepositoryActivity;
 using ADS.SaleEvidence.RetailServices.FileListener.FileProcessor;

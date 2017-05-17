@@ -186,10 +186,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\00 - Common\CompositionRoot\CompositionRoot.csproj">
-      <Project>{21f31b49-4037-494f-ba7b-4a10b4be01fe}</Project>
-      <Name>CompositionRoot</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\01 - Data Layer\01-3 - Repository Activity\IRepositoryActivity\IRepositoryActivity.csproj">
       <Project>{3772a25b-2a6b-43c0-b5c3-a6d3dd5630c0}</Project>
       <Name>IRepositoryActivity</Name>
