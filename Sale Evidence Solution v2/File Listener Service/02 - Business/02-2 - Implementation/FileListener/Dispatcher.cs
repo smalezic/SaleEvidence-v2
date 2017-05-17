@@ -1,6 +1,10 @@
-﻿using log4net;
+﻿using ADS.SaleEvidence.Common.CompositionRoot;
+using ADS.SaleEvidence.RetailServices.FileListener.FileProcessor;
+using ADS.SaleEvidence.RetailServices.RepositoryActivity;
+using log4net;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,24 +20,34 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
         private FileSystemWatcher _watcher;
 
-        private IWorker _worker;
+        //private IWorker _worker;
         private String _folderName;
+
+        private FabricModule _fabricModule;
 
         #endregion Fields
 
         #region Constructors
 
-        public Dispatcher(IWorker worker, String folderName)
+        public Dispatcher(String folderName)
         {
-            var startTime = DateTime.Now;
-
-            _logger.Debug("Constructing the 'Worker' object...");
-
-            _worker = worker;
             _folderName = folderName;
 
-            _logger.DebugFormat("Construction is done in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            _fabricModule = new FabricModule();
+            _fabricModule.Load();
         }
+
+        //public Dispatcher(IWorker worker, String folderName)
+        //{
+        //    var startTime = DateTime.Now;
+
+        //    _logger.Debug("Constructing the 'Worker' object...");
+
+        //    _worker = worker;
+        //    _folderName = folderName;
+
+        //    _logger.DebugFormat("Construction is done in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        //}
 
         #endregion Constructors
 
@@ -108,7 +122,10 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                 _logger.Debug("Wait for one second for finishing file coping");
                 System.Threading.Thread.Sleep(1000);
 
-                _worker.ProccessFile(fileName);
+                var dataActivity = _fabricModule.Resolve<IDataActivity>();
+                var worker = _fabricModule.ResolveWorker(dataActivity);
+
+                worker.ProccessFile(fileName);
             }
             catch (Exception exc)
             {

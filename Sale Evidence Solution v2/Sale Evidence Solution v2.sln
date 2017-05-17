@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryActivity", "File 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRepositoryActivity", "File Listener Service\01 - Data Layer\01-3 - Repository Activity\IRepositoryActivity\IRepositoryActivity.csproj", "{3772A25B-2A6B-43C0-B5C3-A6D3DD5630C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileProcessor", "File Listener Service\02 - Business\02-2 - Implementation\FileProcessor\FileProcessor.csproj", "{86D7DAE3-968F-445F-8904-E1ACE8A335D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileProcessorInterface", "File Listener Service\02 - Business\02-1 - Interfaces\FileProcessorInterface\FileProcessorInterface.csproj", "{C418D187-059D-4DFC-B015-24E983DBDDDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +81,14 @@ Global
 		{3772A25B-2A6B-43C0-B5C3-A6D3DD5630C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3772A25B-2A6B-43C0-B5C3-A6D3DD5630C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3772A25B-2A6B-43C0-B5C3-A6D3DD5630C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86D7DAE3-968F-445F-8904-E1ACE8A335D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86D7DAE3-968F-445F-8904-E1ACE8A335D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86D7DAE3-968F-445F-8904-E1ACE8A335D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86D7DAE3-968F-445F-8904-E1ACE8A335D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C418D187-059D-4DFC-B015-24E983DBDDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C418D187-059D-4DFC-B015-24E983DBDDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C418D187-059D-4DFC-B015-24E983DBDDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C418D187-059D-4DFC-B015-24E983DBDDDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,5 +111,7 @@ Global
 		{E7E542EC-E950-412B-9ED3-2A66E885C303} = {E804612B-5CFF-4B7D-890C-E8C2002B3F2A}
 		{4BC58D50-9267-42C4-AF48-D9348AF3DA22} = {E7E542EC-E950-412B-9ED3-2A66E885C303}
 		{3772A25B-2A6B-43C0-B5C3-A6D3DD5630C0} = {E7E542EC-E950-412B-9ED3-2A66E885C303}
+		{86D7DAE3-968F-445F-8904-E1ACE8A335D0} = {460CD79B-74D3-4DC3-A84C-7E99E3675A75}
+		{C418D187-059D-4DFC-B015-24E983DBDDDA} = {F90D35A7-4D67-4F67-8889-55F96DB2E952}
 	EndGlobalSection
 EndGlobal

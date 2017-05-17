@@ -198,6 +198,10 @@
       <Project>{f0ebc7bb-da2e-4b9d-9699-a1cc5e3370dd}</Project>
       <Name>FileListenerInterface</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\02 - Business\02-2 - Implementation\FileListener\FileListener.csproj">
+      <Project>{f65ec2eb-f06b-472e-9666-31098224a327}</Project>
+      <Name>FileListener</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

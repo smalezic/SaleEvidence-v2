@@ -18,6 +18,6 @@ namespace ADS.SaleEvidence.Common.CompositionRoot
         T Resolve<T>() where T : class;
 
         //T Resolve<T>(String folderName) where T : class;
-        IDispatcher ResolveDispatcher(IWorker worker, String folderName);
+        //IDispatcher ResolveDispatcher(IWorker worker, String folderName);
     }
 }

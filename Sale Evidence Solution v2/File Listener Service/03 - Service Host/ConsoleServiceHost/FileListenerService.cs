@@ -14,18 +14,18 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
         
         private static readonly ILog _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private IDispatcher _worker;
+        private IDispatcher _dispatcher;
 
         #endregion Fields
 
         #region Constructor
-        public FileListenerService(IDispatcher worker)
+        public FileListenerService(IDispatcher dispatcher)
         {
             var startTime = DateTime.Now;
 
             _logger.Debug("Constructing the 'FileListenerService' object...");
 
-            _worker = worker;
+            _dispatcher = dispatcher;
 
             _logger.DebugFormat("Construction is done in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
         }
@@ -42,7 +42,7 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
             {
                 _logger.Debug("Entered method 'Start'");
 
-                _worker.DoWork();
+                _dispatcher.DoWork();
             }
             catch (Exception exc)
             {
@@ -61,7 +61,7 @@ namespace ADS.SaleEvidence.RetailServices.ConsoleServiceHost
             {
                 _logger.Debug("Entered method 'Stop'");
 
-                _worker.Dispose();
+                _dispatcher.Dispose();
             }
             catch (Exception exc)
             {
