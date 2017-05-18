@@ -225,19 +225,14 @@ namespace ADS.SaleEvidence.RetailServices.FileListener.FileProcessor
                                                 };
                                             }
 
-                                            _logger.DebugFormat("Parsing the price - '{0}'", price);
-                                            decimal sellingPrice = 0m;
-                                            decimal.TryParse(price, out sellingPrice);
-                                            _logger.DebugFormat("sellingPrice - '{0}'", sellingPrice);
-
-                                            //using (var scope = new TransactionScope())
-                                            //{
-                                            // Update the CodeBook record
-                                            codeBook.SellingPrice = sellingPrice;
-                                            //codeBook.Name = articleName.Trim();
-
+                                            //_logger.DebugFormat("Parsing the price - '{0}'", price);
+                                            //decimal sellingPrice = 0m;
+                                            //decimal.TryParse(price, out sellingPrice);
+                                            //_logger.DebugFormat("sellingPrice - '{0}'", sellingPrice);
+                                            
                                             if (codeBook.StoreAmount != null)
                                             {
+                                                _logger.DebugFormat("Detract from store - {0}", amount);
                                                 codeBook.StoreAmount -= amount;
                                             }
 
@@ -269,8 +264,6 @@ namespace ADS.SaleEvidence.RetailServices.FileListener.FileProcessor
                                             selling = _dataActivity.Save<Selling>(selling);
 
                                             _logger.Debug("All changes are saved");
-                                            //    scope.Complete();
-                                            //}
                                         }
                                         else
                                         {
