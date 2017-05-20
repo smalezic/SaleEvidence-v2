@@ -22,6 +22,7 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
         //private IWorker _worker;
         private String _folderName;
+        private String _fileExtension;
 
         private FabricModule _fabricModule;
 
@@ -29,9 +30,10 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
         #region Constructors
 
-        public Dispatcher(String folderName)
+        public Dispatcher(String folderName, String fileExtension)
         {
             _folderName = folderName;
+            _fileExtension = fileExtension;
 
             _fabricModule = new FabricModule();
             _fabricModule.Load();
@@ -70,6 +72,7 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
                 _watcher.Changed += new FileSystemEventHandler(OnChanged);
                 _watcher.EnableRaisingEvents = true;
 
+                Task processExistingFiles = Task.Factory.StartNew( () => CheckFolderForAlreadyExistingFiles());
             }
             catch (Exception exc)
             {
@@ -123,10 +126,10 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
 
                 _logger.Debug("Wait for one second for finishing file coping");
                 System.Threading.Thread.Sleep(1000);
+                
+                var worker = GetWorker();
 
-                var dataActivity = _fabricModule.Resolve<IDataActivity>();
-                var worker = _fabricModule.ResolveWorker(dataActivity);
-
+                _logger.DebugFormat("Process the file - {0}", fileName);
                 worker.ProccessFile(fileName);
             }
             catch (Exception exc)
@@ -136,6 +139,60 @@ namespace ADS.SaleEvidence.RetailServices.FileListener
             }
 
             _logger.DebugFormat("Method 'OnChanged' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        }
+
+        private void CheckFolderForAlreadyExistingFiles()
+        {
+            var startTime = DateTime.Now;
+
+            try
+            {
+                _logger.Debug("Entered method 'CheckFolderForAlreadyExistingFiles'");
+                var folder = new DirectoryInfo(_folderName);
+
+                var allFiles = folder.EnumerateFiles();
+                _logger.DebugFormat("Number of files - {0}", allFiles.Count());
+
+                var files = allFiles.Where(it => it.Extension == _fileExtension);
+                _logger.DebugFormat("Number of {0} files - {1}", _fileExtension, allFiles.Count());
+
+                files.ToList().ForEach(it =>
+                {
+                    var worker = GetWorker();
+
+                    _logger.DebugFormat("Process the file - {0}", it.FullName);
+                    worker.ProccessFile(it.FullName);
+                });
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+                throw;
+            }
+
+            _logger.DebugFormat("Method 'CheckFolderForAlreadyExistingFiles' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+        }
+
+        private IWorker GetWorker()
+        {
+            var startTime = DateTime.Now;
+            IWorker worker;
+
+            try
+            {
+                _logger.Debug("Entered method 'GetWorker'");
+
+                var dataActivity = _fabricModule.Resolve<IDataActivity>();
+                worker = _fabricModule.ResolveWorker(dataActivity);
+            }
+            catch (Exception exc)
+            {
+                _logger.Error("Error - ", exc);
+                throw;
+            }
+
+            _logger.DebugFormat("Method 'GetWorker' has been completed in {0}ms", (DateTime.Now - startTime).TotalMilliseconds);
+            return worker;
         }
 
         #endregion Private methods
